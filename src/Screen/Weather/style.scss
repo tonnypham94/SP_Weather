@@ -1,0 +1,250 @@
+.ContainerWeather {
+  color: #ffffff;
+  .cw-Header{
+    background-image: linear-gradient( #0068cc, #70b9ff);
+    .cw-ContentHeader{
+      max-width: 1000px;
+      margin: auto;
+      .cw-wrapTitle {
+        display: flex;
+        color: #ffffff;
+        justify-content: space-between;
+        padding: 10px 30px;
+        .cw-location {
+          .cw-imgDown {
+            width: 12px;
+            margin-left: 5px;
+            margin-bottom: -2px;
+            cursor: pointer;
+          }
+        }
+        .cw-menu {
+          width: 30px;
+          height: 42px;
+          cursor: pointer;
+        }
+        .cw-bell {
+          width: 30px;
+          height: 42px;
+          cursor: pointer;
+        }
+      }
+      .cw-Detail {
+        display: flex;
+        justify-content: center;
+        padding-top: 80px;
+        padding-bottom: 100px;
+        .cw-imgCloud {
+          width: 70px;
+          height: 85px;
+        }
+        .cw-DetailContent {
+          margin-left: 30px;
+          .cwd-name {
+            font-size: 40px;
+            text-align: left;
+          }
+          .cwd-heatAndHumidity {
+            display: flex;
+            .cwd-heat {
+              margin-right: 50px;
+              & > span {
+                font-size: 24px;
+              }
+              & > .cw-imgHeat {
+                width: 24px;
+                margin-bottom: -3px;
+              }
+            }
+            .cwd-humidity {
+              & > span {
+                font-size: 24px;
+              }
+              & > .cw-imgHumidity {
+                width: 24px;
+                margin-bottom: -3px;
+              }
+            }
+          }
+        }
+      }
+      .cw-Add {
+        display: flex;
+        justify-content: center;
+        .cw-PSI {
+          width: 25%;
+          max-width: 100px;
+          background-image: linear-gradient(#70b9ff, #ffffff);
+          background-repeat: no-repeat;
+          background-size: 1px 100%;
+          background-position-x: right;
+          padding: 10px 0;
+          .cwP-number {
+            background: #1ae863;
+            width: 40px;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+            margin-top: 7px;
+            margin-bottom: 7px;
+            font-size: 30px;
+            border-radius: 4px;
+          }
+          .cwP-status {
+            font-size: 13px;
+          }
+        }
+        .cw-Rain {
+          width: 25%;
+          max-width: 100px;
+          background-image: linear-gradient(#70b9ff, #ffffff);
+          background-repeat: no-repeat;
+          background-size: 1px 100%;
+          background-position-x: right;
+          padding: 10px 0;
+          .cwR-number {
+            margin-top: 5px;
+            margin-bottom: 5px;
+            font-size: 30px;
+          }
+          .cwR-status {
+            font-size: 13px;
+          }
+        }
+        .cw-Dengue {
+          width: 25%;
+          max-width: 100px;
+          background-image: linear-gradient(#70b9ff, #ffffff);
+          background-repeat: no-repeat;
+          background-size: 1px 100%;
+          background-position-x: right;
+          padding: 10px 0;
+          .cwD-circle {
+            background: #82b6f7;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: auto;
+            margin-top: 8px;
+            border: 2px solid;
+          }
+        }
+        .cw-AddTab {
+          width: 25%;
+          max-width: 100px;
+          padding: 10px 0;
+          .cwA-name {
+            color: #000000;
+          }
+          .cwA-imgAdd {
+            width: 35px;
+            margin-top: 12px;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
+  .cw-chart {
+    width: 700px;
+    overflow-x: scroll;
+  }
+  .cw-WrapCanvas {
+    // max-width: 1000px;
+    margin: auto;
+    position: relative;
+    .cw-Canvas {
+      position: relative;
+      overflow-x: scroll;
+      max-width: 100%;
+      margin: auto;
+      .tooltip {
+        color: rebeccapurple;
+        position: absolute;
+        top: 10px;
+        left: 100px;
+      }
+    }
+    .cw-imgSun {
+      width: 20px;
+      position: absolute;
+      margin-left: -11px;
+      margin-top: -11px;
+    }
+    .cw-imgMoon {
+      width: 20px;
+      position: absolute;
+      top: 26%;
+      left: calc(50% - 10px);
+      z-index: 1;
+    }
+    .cw-TideAndSun {
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      font-size: 20px;
+      .cw-Tide {
+        color: #80dcff;
+      }
+      .cw-Dot {
+        color: #afc7d0;
+        font-size: 20px;
+      }
+      .cw-Sun {
+        color: #f98a00;
+      }
+    }
+    .cw-day {
+      color: #000000;
+      position: absolute;
+      top: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 23px;
+    }
+    .cw-measure {
+      width: 2px;
+      background-image: linear-gradient(#ffffff, #bbbfc3);
+      position: absolute;
+      height: 200px;
+      top: 50px;
+      left: calc(50% - 2px);
+    }
+    .cw-time {
+      color: #5f5f5f;
+      font-size: 17px;
+      font-weight: 500;
+      position: absolute;
+      top: 250px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #d4d4d4;
+    }
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .ContainerWeather {
+    .cw-Header{
+      .cw-ContentHeader{
+        .cw-wrapTitle {
+          padding: 10px 20px;
+        }
+        .cw-Detail {
+          padding-top: 70px;
+          padding-bottom: 80px;
+          .cw-DetailContent {
+            margin-left: 10px;
+            .cwd-heatAndHumidity {
+              .cwd-heat {
+                margin-right: 20px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
