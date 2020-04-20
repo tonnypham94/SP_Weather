@@ -10,8 +10,7 @@ const HEIGHT_CHART = 250
 const SECOND_PER_DAY = 86400
 const MAX_WIDTH_OF_CANVAS = 1000
 let createData = [
-  { day: '13ᵗʰ April',
-    sunrise: 1586761513,
+  { sunrise: 1586761513,
     sunset: 1586804953,
     startNight: 1586808553,
     startDay: 1586756812,
@@ -25,8 +24,7 @@ let createData = [
       {point: 80, time: 1586817913, amountOfWater: '0.8m'},
     ]
   },
-  { day: '14ᵗʰ April',
-    sunrise: 1586847913,
+  { sunrise: 1586847913,
     sunset: 1586891353,
     startNight: 1586894953,
     startDay: 1586844013,
@@ -39,8 +37,7 @@ let createData = [
       {point: 80, time: 1586904313, amountOfWater: '0.8m'},
     ]
   },
-  { day: '15ᵗʰ April',
-    sunrise: 1586934313,
+  { sunrise: 1586934313,
     sunset: 1586977753,
     startNight: 1586981353,
     startDay: 1586930413,
@@ -113,10 +110,10 @@ function TestWeather() {
     let widthOfSunShow = sunset - sunrise
     let rateOfWidthSunShow = e ? ((e.target.scrollLeft + (widthOfWeb / 2) - sunrise) / widthOfSunShow) : 0
     let topPositionOfSun = getBezierXY(rateOfWidthSunShow, sunrise, HEIGHT_CHART, sunrise + bezierCurve, HEIGHT_CHART / 3, sunset - bezierCurve, HEIGHT_CHART / 3, sunset, HEIGHT_CHART)
-    setPositionOfSun(topPositionOfSun)
-    setRangeDay(arrRangeDay)
     ctx.strokeStyle = '#f98a00'
     ctx.stroke()
+    setPositionOfSun(topPositionOfSun)
+    setRangeDay(arrRangeDay)
   }
   const canvasForNight = (ctx, startOfDay) => {
     ctx.beginPath()
@@ -144,9 +141,9 @@ function TestWeather() {
         arrMoon = [...arrMoon, {startNight, startDay: endOfDay}]
       }
     }
-    setRangeNight(arrMoon)
     ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
     ctx.fill()
+    setRangeNight(arrMoon)
   }
   const canvasForTooltip = (ctx, i, x1, y1) => {
     CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
@@ -200,42 +197,42 @@ function TestWeather() {
   }
   const canvasForChart = () => {
     const ctx = canvasRef.current.getContext('2d')
-    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
-    let startOfDay = getStartOfDay(allPointTide[0].time)
-    let getMaxPoint = Math.max(...allPointTide.map(e => e.point))
-    let ratioHeightChart = HEIGHT_CHART * 0.5
-    ctx.beginPath()
-    ctx.moveTo(0, HEIGHT_CHART)
-    ctx.lineTo(0, HEIGHT_CHART - allPointTide[0].point / getMaxPoint * ratioHeightChart)
-    for (let i = 1; i < allPointTide.length - 2; i++) {
-      let x1 = (allPointTide[i].time - startOfDay) / SECOND_PER_DAY * widthOfCanvas
-      let x2 = (allPointTide[i + 1].time - startOfDay) / SECOND_PER_DAY * widthOfCanvas
-      let xc = (x1 + x2) / 2
-      let y1 = HEIGHT_CHART - allPointTide[i].point / getMaxPoint * ratioHeightChart
-      let y2 = HEIGHT_CHART - allPointTide[i + 1].point / getMaxPoint * ratioHeightChart
-      let yc = (y1 + y2) / 2
-      ctx.quadraticCurveTo(x1, y1, xc, yc)
+    if (ctx) {
+      let startOfDay = getStartOfDay(allPointTide[0].time)
+      let getMaxPoint = Math.max(...allPointTide.map(e => e.point))
+      let ratioHeightChart = HEIGHT_CHART * 0.5
+      ctx.beginPath()
+      ctx.moveTo(0, HEIGHT_CHART)
+      ctx.lineTo(0, HEIGHT_CHART - allPointTide[0].point / getMaxPoint * ratioHeightChart)
+      for (let i = 1; i < allPointTide.length - 2; i++) {
+        let x1 = (allPointTide[i].time - startOfDay) / SECOND_PER_DAY * widthOfCanvas
+        let x2 = (allPointTide[i + 1].time - startOfDay) / SECOND_PER_DAY * widthOfCanvas
+        let xc = (x1 + x2) / 2
+        let y1 = HEIGHT_CHART - allPointTide[i].point / getMaxPoint * ratioHeightChart
+        let y2 = HEIGHT_CHART - allPointTide[i + 1].point / getMaxPoint * ratioHeightChart
+        let yc = (y1 + y2) / 2
+        ctx.quadraticCurveTo(x1, y1, xc, yc)
+      }
+      ctx.quadraticCurveTo(
+        (allPointTide[allPointTide.length - 2].time - startOfDay) / SECOND_PER_DAY * widthOfCanvas, 
+        HEIGHT_CHART - allPointTide[allPointTide.length - 2].point / getMaxPoint * ratioHeightChart, 
+        (allPointTide[allPointTide.length - 1].time - startOfDay) / SECOND_PER_DAY * widthOfCanvas,
+        HEIGHT_CHART - allPointTide[allPointTide.length - 1].point / getMaxPoint * ratioHeightChart
+      )
+      ctx.lineTo((allPointTide[allPointTide.length - 1].time - startOfDay) / SECOND_PER_DAY * widthOfCanvas, HEIGHT_CHART)
+      ctx.strokeStyle = '#6dd7ff'
+      ctx.stroke()
+      ctx.fillStyle = '#80dcff'
+      ctx.fill()
+      for (let i = 1; i < allPointTide.length - 2; i++) {
+        let x1 = (allPointTide[i].time - startOfDay) / SECOND_PER_DAY * widthOfCanvas
+        let y1 = HEIGHT_CHART - allPointTide[i].point / getMaxPoint * ratioHeightChart
+        canvasForTooltip(ctx, i, x1, y1)
+      }
+      canvasForSun()
+      canvasForNight(ctx, startOfDay)
+      canvasForBottom(ctx)
     }
-    ctx.quadraticCurveTo(
-      (allPointTide[allPointTide.length - 2].time - startOfDay) / SECOND_PER_DAY * widthOfCanvas, 
-      HEIGHT_CHART - allPointTide[allPointTide.length - 2].point / getMaxPoint * ratioHeightChart, 
-      (allPointTide[allPointTide.length - 1].time - startOfDay) / SECOND_PER_DAY * widthOfCanvas,
-      HEIGHT_CHART - allPointTide[allPointTide.length - 1].point / getMaxPoint * ratioHeightChart
-    )
-    ctx.lineTo((allPointTide[allPointTide.length - 1].time - startOfDay) / SECOND_PER_DAY * widthOfCanvas, HEIGHT_CHART)
-    ctx.strokeStyle = '#6dd7ff'
-    ctx.stroke()
-    ctx.fillStyle = '#80dcff'
-    ctx.fill()
-    for (let i = 1; i < allPointTide.length - 2; i++) {
-      let x1 = (allPointTide[i].time - startOfDay) / SECOND_PER_DAY * widthOfCanvas
-      let y1 = HEIGHT_CHART - allPointTide[i].point / getMaxPoint * ratioHeightChart
-      canvasForTooltip(ctx, i, x1, y1)
-    }
-    // ctx.globalCompositeOperation='destination-over'
-    canvasForSun()
-    canvasForNight(ctx, startOfDay)
-    canvasForBottom(ctx)
   }
   const handleScrollChart = (e) => {
     let startOfDay = getStartOfDay(initialData[0].data[0].time)
