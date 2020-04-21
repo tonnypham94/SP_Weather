@@ -1,63 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Images from '../../Assets/Images'
 import moment from 'moment'
+import exportFunctions from './action'
+import {INNER_WIDTH, NUM_OF_ZOOM, WIDTH_CANVAS, HEIGHT_CHART, SECOND_PER_DAY, MAX_WIDTH_OF_CANVAS, CREATE_DATA} from '../../Utils/globalConstance'
 import './style.scss'
 
-const INNER_WIDTH = window.innerWidth
-const NUM_OF_ZOOM = 2
-const WIDTH_CANVAS = INNER_WIDTH * NUM_OF_ZOOM
-const HEIGHT_CHART = 250
-const SECOND_PER_DAY = 86400
-const MAX_WIDTH_OF_CANVAS = 1000
-let createData = [
-  { sunrise: 1586761513,
-    sunset: 1586804953,
-    startNight: 1586808553,
-    startDay: 1586756812,
-    data: [
-      {point: 30, time: 1586736000, amountOfWater: '0.3m'},
-      {point: 15, time: 1586745913, amountOfWater: '0.15m'},
-      {point: 81, time: 1586763913, amountOfWater: '0.8m'},
-      {point: 30, time: 1586778313, amountOfWater: '0.3m'},
-      {point: 90, time: 1586789113, amountOfWater: '0.9m'},
-      {point: 15, time: 1586807113, amountOfWater: '0.15m'},
-      {point: 80, time: 1586817913, amountOfWater: '0.8m'},
-    ]
-  },
-  { sunrise: 1586847913,
-    sunset: 1586891353,
-    startNight: 1586894953,
-    startDay: 1586844013,
-    data: [
-      {point: 15, time: 1586832313, amountOfWater: '0.15m'},
-      {point: 81, time: 1586850313, amountOfWater: '0.8m'},
-      {point: 30, time: 1586864713, amountOfWater: '0.3m'},
-      {point: 90, time: 1586875513, amountOfWater: '0.9m'},
-      {point: 15, time: 1586893513, amountOfWater: '0.15m'},
-      {point: 80, time: 1586904313, amountOfWater: '0.8m'},
-    ]
-  },
-  { sunrise: 1586934313,
-    sunset: 1586977753,
-    startNight: 1586981353,
-    startDay: 1586930413,
-    data: [
-      {point: 15, time: 1586918713, amountOfWater: '0.15m'},
-      {point: 81, time: 1586936713, amountOfWater: '0.8m'},
-      {point: 30, time: 1586951113, amountOfWater: '0.3m'},
-      {point: 90, time: 1586961913, amountOfWater: '0.9m'},
-      {point: 15, time: 1586979913, amountOfWater: '0.15m'},
-      {point: 80, time: 1586990713, amountOfWater: '0.8m'},
-      {point: 50, time: 1586995199, amountOfWater: '0.5m'},
-    ]
-  }
-]
-
-function TestWeather() {
+function Weather() {
   const [initialData, setInitialData] = useState()
   const [widthOfWeb, setWidthOfWeb] = useState(INNER_WIDTH)
   const [widthOfCanvas, setWidthOfCanvas] = useState(WIDTH_CANVAS)
-  const [rangeDay, setRangeDay] = useState({})
+  const [rangeDay, setRangeDay] = useState({abc: 1})
   const [sunShowed, setSunShowed] = useState(false)
   const [rangeNight, setRangeNight] = useState({})
   const [moonShowed, setMoonShowed] = useState(false)
@@ -65,14 +17,11 @@ function TestWeather() {
   const [allPointTide, setAllPointTide] = useState()
   const [positionOfSun, setPositionOfSun] = useState()
   const canvasRef = useRef(null)
-  const sum = (a, b) => {
-    return a + b;
-  }
   const getStartOfDay = (day) => {
     return Math.floor(day / SECOND_PER_DAY) * SECOND_PER_DAY
   }
   const getTimeMiddleChart = (startOfDay, e = undefined) => {
-    return Math.floor(startOfDay + SECOND_PER_DAY / 4 + (e ? (e.target.scrollLeft / widthOfWeb / NUM_OF_ZOOM * SECOND_PER_DAY) : 0))
+    return Math.floor(startOfDay + SECOND_PER_DAY / 4 + (e && e.target ? (e.target.scrollLeft / widthOfWeb / NUM_OF_ZOOM * SECOND_PER_DAY) : 0))
   }
   const getAllPointTide = () => {
     let data = []
@@ -81,17 +30,47 @@ function TestWeather() {
     })
     return data
   }
-  const getBezierXY = (t, sx, sy, cp1x, cp1y, cp2x, cp2y, ex, ey) => {
-    return {
-      x: Math.pow(1-t,3) * sx + 3 * t * Math.pow(1 - t, 2) * cp1x 
-      + 3 * t * t * (1 - t) * cp2x + t * t * t * ex,
-      y: Math.pow(1-t,3) * sy + 3 * t * Math.pow(1 - t, 2) * cp1y 
-      + 3 * t * t * (1 - t) * cp2y + t * t * t * ey
+  const canvasForTooltip = (ctx, i, x1, y1) => {
+    const roundRect = (x, y, w, h, r) => {
+      if (w < 2 * r) r = w / 2
+      if (h < 2 * r) r = h / 2
+      ctx.beginPath()
+      ctx.moveTo(x+r, y)
+      ctx.arcTo(x+w, y,   x+w, y+h, r)
+      ctx.arcTo(x+w, y+h, x,   y+h, r)
+      ctx.arcTo(x,   y+h, x,   y,   r)
+      ctx.arcTo(x,   y,   x+w, y,   r)
+      ctx.closePath()
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)'
+      ctx.fill()
+      ctx.stroke()
+    }
+    roundRect(x1 - 30, y1 - 18, 60, 36, 6)
+  
+    ctx.fillStyle = '#0068cc'
+    ctx.font = '18px Segoe UI'
+    ctx.textAlign = 'center'
+    ctx.fillText(allPointTide[i].amountOfWater, x1, y1)
+    ctx.font = '12px Segoe UI'
+    ctx.fillText(moment(allPointTide[i].time * 1000).utc().format('hh:mm a'), x1, y1 + 13)
+  }
+  const canvasForTimeOfSun = () => {
+    let startOfDay = allPointTide && getStartOfDay(allPointTide[0].time)
+    const ctx = canvasRef && canvasRef.current && canvasRef.current.getContext('2d')
+    ctx.beginPath()
+    for(let i = 0; i < rangeDay.length; i++) {
+      let x = (rangeDay[i].timmeStampSunrise - startOfDay) / SECOND_PER_DAY * widthOfCanvas
+      let x1 = (rangeDay[i].timmeStampSunset - startOfDay) / SECOND_PER_DAY * widthOfCanvas
+      ctx.fillStyle = '#f98a00'
+      ctx.font = '14px Segoe UI'
+      ctx.textAlign = 'center'
+      ctx.fillText(moment(rangeDay[i].timmeStampSunrise * 1000).utc().format('hh:mm a'), x, HEIGHT_CHART + 15)
+      ctx.fillText(moment(rangeDay[i].timmeStampSunset * 1000).utc().format('hh:mm a'), x1, HEIGHT_CHART + 15)
     }
   }
   const canvasForSun = (e = undefined, index = 0) => {
     let startOfDay = getStartOfDay(allPointTide[0].time)
-    const ctx = canvasRef.current.getContext('2d')
+    const ctx = canvasRef.current && canvasRef.current.getContext('2d')
     ctx.beginPath()
     let arrRangeDay = []
     for (let i = 0; i < initialData.length; i++) {
@@ -109,7 +88,7 @@ function TestWeather() {
     let sunset = (initialData[index].sunset - startOfDay) / SECOND_PER_DAY * widthOfCanvas
     let widthOfSunShow = sunset - sunrise
     let rateOfWidthSunShow = e ? ((e.target.scrollLeft + (widthOfWeb / 2) - sunrise) / widthOfSunShow) : 0
-    let topPositionOfSun = getBezierXY(rateOfWidthSunShow, sunrise, HEIGHT_CHART, sunrise + bezierCurve, HEIGHT_CHART / 3, sunset - bezierCurve, HEIGHT_CHART / 3, sunset, HEIGHT_CHART)
+    let topPositionOfSun = exportFunctions.getBezierXY(rateOfWidthSunShow, sunrise, HEIGHT_CHART, sunrise + bezierCurve, HEIGHT_CHART / 3, sunset - bezierCurve, HEIGHT_CHART / 3, sunset, HEIGHT_CHART)
     ctx.strokeStyle = '#f98a00'
     ctx.stroke()
     setPositionOfSun(topPositionOfSun)
@@ -145,31 +124,6 @@ function TestWeather() {
     ctx.fill()
     setRangeNight(arrMoon)
   }
-  const canvasForTooltip = (ctx, i, x1, y1) => {
-    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-      if (w < 2 * r) r = w / 2
-      if (h < 2 * r) r = h / 2
-      this.beginPath()
-      this.moveTo(x+r, y)
-      this.arcTo(x+w, y,   x+w, y+h, r)
-      this.arcTo(x+w, y+h, x,   y+h, r)
-      this.arcTo(x,   y+h, x,   y,   r)
-      this.arcTo(x,   y,   x+w, y,   r)
-      this.closePath()
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)'
-      ctx.fill()
-      return this
-    }
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0)'
-    ctx.roundRect(x1 - 30, y1 - 18, 60, 36, 6).stroke()
-
-    ctx.fillStyle = '#0068cc'
-    ctx.font = '18px Segoe UI'
-    ctx.textAlign = 'center'
-    ctx.fillText(allPointTide[i].amountOfWater, x1, y1)
-    ctx.font = '12px Segoe UI'
-    ctx.fillText(moment(allPointTide[i].time * 1000).utc().format('hh:mm a'), x1, y1 + 13)
-  }
   const canvasForBottom = (ctx) => {
     ctx.beginPath()
     ctx.moveTo(0, HEIGHT_CHART)
@@ -181,22 +135,8 @@ function TestWeather() {
     ctx.fillStyle = '#d4d4d4'
     ctx.fill()
   }
-  const canvasForTimeOfSun = () => {
-    let startOfDay = getStartOfDay(allPointTide[0].time)
-    const ctx = canvasRef.current.getContext('2d')
-    ctx.beginPath()
-    for(let i = 0; i < rangeDay.length; i++) {
-      let x = (rangeDay[i].timmeStampSunrise - startOfDay) / SECOND_PER_DAY * widthOfCanvas
-      let x1 = (rangeDay[i].timmeStampSunset - startOfDay) / SECOND_PER_DAY * widthOfCanvas
-      ctx.fillStyle = '#f98a00'
-      ctx.font = '14px Segoe UI'
-      ctx.textAlign = 'center'
-      ctx.fillText(moment(rangeDay[i].timmeStampSunrise * 1000).utc().format('hh:mm a'), x, HEIGHT_CHART + 15)
-      ctx.fillText(moment(rangeDay[i].timmeStampSunset * 1000).utc().format('hh:mm a'), x1, HEIGHT_CHART + 15)
-    }
-  }
   const canvasForChart = () => {
-    const ctx = canvasRef.current.getContext('2d')
+    const ctx = canvasRef.current && canvasRef.current.getContext('2d')
     if (ctx) {
       let startOfDay = getStartOfDay(allPointTide[0].time)
       let getMaxPoint = Math.max(...allPointTide.map(e => e.point))
@@ -235,10 +175,10 @@ function TestWeather() {
     }
   }
   const handleScrollChart = (e) => {
-    let startOfDay = getStartOfDay(initialData[0].data[0].time)
+    let startOfDay = initialData && getStartOfDay(initialData[0].data[0].time)
     let timeMiddleChart = getTimeMiddleChart(startOfDay, e)
     setTime(timeMiddleChart)
-    let positionMiddleChart = e.target.scrollLeft + widthOfWeb / 2
+    let positionMiddleChart = e.target && e.target.scrollLeft + widthOfWeb / 2
     for (let i=0; i < rangeDay.length; i++) {
       if (rangeDay[i].sunrise <= positionMiddleChart && positionMiddleChart <= rangeDay[i].sunset) {
         setSunShowed(true)
@@ -290,7 +230,7 @@ function TestWeather() {
     }
   }, [initialData])
   useEffect(() => {
-    setInitialData(createData)
+    setInitialData(CREATE_DATA)
     setWidthOfWeb(window.innerWidth > MAX_WIDTH_OF_CANVAS ? MAX_WIDTH_OF_CANVAS : window.innerWidth)
     setWidthOfCanvas((window.innerWidth > MAX_WIDTH_OF_CANVAS ? MAX_WIDTH_OF_CANVAS : window.innerWidth) * NUM_OF_ZOOM)
   }, [])
@@ -372,4 +312,4 @@ function TestWeather() {
   );
 }
 
-export default TestWeather
+export default Weather
