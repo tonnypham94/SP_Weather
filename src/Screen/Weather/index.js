@@ -45,6 +45,7 @@ function Weather() {
       ctx.fill()
       ctx.stroke()
     }
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0)'
     roundRect(x1 - 30, y1 - 18, 60, 36, 6)
   
     ctx.fillStyle = '#0068cc'
